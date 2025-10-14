@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Crystal Garden</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #18121b; /* deep muted black-violet */
+        --rose: #e8a4c0; /* soft rose pink */
+        --rose-dark: #b86a8c; /* muted rose for accents */
+        --violet: #7c5cbf; /* soft violet */
+        --violet-dark: #4b2e6f; /* muted violet for accents */
+        --glass: rgba(255, 255, 255, 0.04);
+        --card-bg: linear-gradient(180deg, #22162b 0%, #2d1a36 100%);
+        --glow-soft: 0 6px 30px rgba(124, 92, 191, 0.12);
+        font-family: "Marcellus", serif;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: radial-gradient(
+            ellipse at 10% 10%,
+            rgba(124, 92, 191, 0.1),
+            transparent 18%
+          ),
+          radial-gradient(
+            ellipse at 90% 90%,
+            rgba(232, 164, 192, 0.08),
+            transparent 14%
+          ),
+          linear-gradient(180deg, #18121b 0%, #2d1a36 100%);
+        color: #f8eef5;
+      }
+
+      .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Welcome overlay */
+      .welcome {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          180deg,
+          rgba(24, 18, 27, 0.7),
+          rgba(124, 92, 191, 0.18),
+          rgba(232, 164, 192, 0.18),
+          rgba(24, 18, 27, 0.7)
+        );
+        z-index: 60;
+        backdrop-filter: blur(6px);
+        flex-direction: column;
+        gap: 18px;
+        padding: 24px;
+        text-align: center;
+      }
+      .welcome h1 {
+        font-family: "Marcellus", serif;
+        font-size: 48px;
+        margin: 0;
+        color: var(--rose);
+        text-shadow: 0 8px 40px rgba(124, 92, 191, 0.18);
+        letter-spacing: 1px;
+      }
+      .welcome p {
+        margin: 0;
+        color: #e8a4c0;
+        font-size: 18px;
+      }
+
+      /* Page layout */
+      header {
+        position: fixed;
+        left: 20px;
+        top: 18px;
+        z-index: 30;
+      }
+      header .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .brand .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(90deg, var(--rose), var(--violet));
+        box-shadow: 0 6px 18px rgba(139, 92, 246, 0.15);
+      }
+      header .title {
+        font-weight: 600;
+        color: var(--rose-dark);
+        font-size: 16px;
+      }
+
+      main {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 20px 120px;
+        background: linear-gradient(
+          180deg,
+          rgba(124, 92, 191, 0.08) 0%,
+          rgba(24, 18, 27, 0.95) 100%
+        );
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(124, 92, 191, 0.08);
+      }
+
+      /* Crystals area */
+      .garden {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        align-items: end;
+        width: 100%;
+        max-width: 1100px;
+        margin-top: 10px;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(18px);
+        transition: all 600ms cubic-bezier(0.2, 0.9, 0.2, 1);
+        background: linear-gradient(
+          120deg,
+          rgba(232, 164, 192, 0.08) 0%,
+          rgba(124, 92, 191, 0.08) 100%
+        );
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(124, 92, 191, 0.08);
+      }
+      .garden.show {
+        visibility: visible;
+        opacity: 1;
+        transform: none;
+      }
+
+      .crystal {
+        background: linear-gradient(
+          180deg,
+          rgba(232, 164, 192, 0.1) 0%,
+          rgba(124, 92, 191, 0.1) 100%
+        );
+        border-radius: 18px;
+
+        border: 1px solid rgba(124, 92, 191, 0.08);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        box-shadow: var(--glow-soft), 0 6px 20px rgba(24, 18, 27, 0.6);
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1),
+          box-shadow 0.35s;
+        position: relative;
+        overflow: visible;
+      }
+
+      .crystal img {
+        width: 180px;
+        height: 180px;
+        object-fit: contain;
+        transform-origin: center;
+        filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.65));
+        transition: transform 0.5s;
+        border-radius: 18px; /* <-- add this line for softer edges */
+      }
+
+      /* floating animation */
+      @keyframes floaty {
+        0% {
+          transform: translateY(0px) rotate(-1deg);
+        }
+        50% {
+          transform: translateY(-14px) rotate(1deg);
+        }
+        100% {
+          transform: translateY(0px) rotate(-1deg);
+        }
+      }
+      .crystal .float {
+        animation: floaty 5s ease-in-out infinite;
+      }
+
+      .crystal:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 25px 70px rgba(139, 92, 246, 0.22);
+      }
+      .crystal:after {
+        content: "";
+        position: absolute;
+        inset: 1px;
+        border-radius: 20px;
+        pointer-events: none;
+        background: linear-gradient(
+          90deg,
+          rgba(139, 92, 246, 0.04),
+          rgba(236, 72, 153, 0.02)
+        );
+        mix-blend-mode: overlay;
+        transition: opacity 0.25s;
+        opacity: 0;
+      }
+      .crystal:hover:after {
+        opacity: 1;
+        filter: blur(8px);
+      }
+
+      /* neon edge glow for each crystal, use data-color */
+      .crystal[data-color="rose"] img {
+        box-shadow: 0 18px 40px rgba(232, 164, 192, 0.18);
+      }
+      .crystal[data-color="rose"] {
+        border: 1px solid rgba(243, 166, 191, 0.08);
+      }
+      .crystal[data-color="rose"].hover-glow {
+        box-shadow: 0 30px 80px rgba(243, 166, 191, 0.18);
+        outline: 2px solid rgba(243, 166, 191, 0.06);
+      }
+
+      .crystal[data-color="violet"] img {
+        box-shadow: 0 18px 40px rgba(124, 92, 191, 0.18);
+      }
+      .crystal[data-color="violet"] {
+        border: 1px solid rgba(139, 92, 246, 0.06);
+      }
+
+      .crystal[data-color="green"] img {
+        box-shadow: 0 18px 40px rgba(47, 164, 106, 0.12);
+      }
+      .crystal[data-color="green"] {
+        border: 1px solid rgba(47, 164, 106, 0.05);
+      }
+
+      .crystal[data-color="yellow"] img {
+        box-shadow: 0 18px 40px rgba(232, 210, 164, 0.18);
+      }
+      .crystal[data-color="yellow"] {
+        border: 1px solid rgba(232, 210, 164, 0.05);
+      }
+
+      .crystal[data-color="blue"] img {
+        box-shadow: 0 18px 40px rgba(164, 210, 232, 0.18);
+      }
+      .crystal[data-color="blue"] {
+        border: 1px solid rgba(164, 210, 232, 0.05);
+      }
+
+      .crystal[data-color="black"] img {
+        box-shadow: 0 18px 40px rgba(24, 18, 27, 0.18);
+      }
+      .crystal[data-color="black"] {
+        border: 1px solid rgba(24, 18, 27, 0.05);
+      }
+
+      /* Card modal */
+      .cardModal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 70;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.7)
+        );
+        backdrop-filter: blur(6px);
+      }
+      .card {
+        width: min(760px, 92%);
+        border-radius: 18px;
+        padding: 26px;
+        box-shadow: 0 30px 80px rgba(124, 92, 191, 0.12);
+        background: linear-gradient(
+          180deg,
+          rgba(124, 92, 191, 0.1) 0%,
+          rgba(24, 18, 27, 0.98) 100%
+        );
+        border: 1px solid rgba(232, 164, 192, 0.08);
+        position: relative;
+        overflow: hidden;
+        transform: translateY(12px) scale(0.98);
+        opacity: 0;
+        transition: all 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
+      }
+      .card.show {
+        transform: none;
+        opacity: 1;
+      }
+
+      .card .inner {
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+      }
+      .card img {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .card h3 {
+        margin: 0;
+        font-family: "Marcellus", serif;
+        font-size: 24px;
+        color: var(--rose);
+      }
+      .card p {
+        margin-top: 10px;
+        color: #e8a4c0;
+        line-height: 1.55;
+        font-size: 16px;
+      }
+
+      /* glowing border animation */
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 20px;
+        pointer-events: none;
+        background: conic-gradient(
+          from 120deg,
+          rgba(243, 166, 191, 0.12),
+          rgba(139, 92, 246, 0.1),
+          rgba(47, 164, 106, 0.08),
+          rgba(243, 166, 191, 0.12)
+        );
+        filter: blur(14px);
+        opacity: 0;
+        transition: opacity 0.45s;
+        transform: scale(1.06);
+      }
+      .card.show::before {
+        opacity: 1;
+        animation: spin 6s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg) scale(1.06);
+        }
+      }
+
+      .controls {
+        position: fixed;
+        right: 18px;
+        top: 18px;
+        z-index: 80;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        background: linear-gradient(
+          90deg,
+          rgba(232, 164, 192, 0.12),
+          rgba(124, 92, 191, 0.12)
+        );
+        border: 1px solid rgba(124, 92, 191, 0.12);
+        padding: 8px 12px;
+        border-radius: 999px;
+        color: var(--rose-dark);
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .mute {
+        opacity: 0.9;
+      }
+      .hint {
+        margin-top: 18px;
+        color: var(--violet);
+        font-size: 13px;
+        opacity: 0.8;
+        text-align: center;
+      }
+
+      /* small responsive tweaks */
+      @media (max-width: 880px) {
+        .garden {
+          grid-template-columns: repeat(1, 1fr);
+          gap: 24px;
+        }
+        .crystal img {
+          width: 220px;
+          height: 220px;
+        }
+        .card img {
+          width: 90px;
+          height: 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="dot"></div>
+        <div class="title">Crystal Garden for Fiona</div>
+      </div>
+    </header>
+
+    <!-- controls -->
+    <div class="controls">
+      <button id="playBtn" class="btn">Play ✨</button>
+      <button id="pauseBtn" class="btn" style="display: none">Pause ▮▮</button>
+    </div>
+
+    <!-- welcome overlay -->
+    <div id="welcome" class="welcome" aria-hidden="false">
+      <h1>Welcome, Fiona</h1>
+      <p>
+        You are a light in my life. This garden is a small reflection of the
+        love, hope, and strength you've given me. I hope each crystal reminds
+        you how deeply you are cherished.
+      </p>
+    </div>
+
+    <main>
+      <div class="center">
+        <div style="max-width: 880px; text-align: center">
+          <h2
+            style="
+              font-family: 'Marcellus', serif;
+              font-size: 36px;
+              margin: 0;
+              color: var(--rose);
+            "
+          >
+            A small crystal garden
+          </h2>
+          <div class="hint">
+            Click a floating crystal to reveal a birthday message ❤️
+          </div>
+        </div>
+      </div>
+
+      <section id="garden" class="garden" aria-hidden="true">
+        <!-- crystals will be injected here -->
+      </section>
+    </main>
+
+    <!-- modal card -->
+    <div
+      id="cardModal"
+      class="cardModal"
+      style="display: none"
+      aria-hidden="true"
+    >
+      <div id="card" class="card" role="dialog" aria-modal="true">
+        <div class="inner">
+          <img id="cardImg" src="" alt="crystal" />
+          <div>
+            <h3 id="cardTitle">Title</h3>
+            <p id="cardMsg">Message</p>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px">
+          <button id="closeCard" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <audio id="bgm" loop preload="auto">
+      <source src="audio/happy-birthday.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+      const crystals = [
+        {
+          id: "amethyst",
+          title: "Amethyst — Calm",
+          message:
+            "Amethyst brings calm and clarity. May you find peace and gentle strength in every moment. Thank you for being a beam of hope in my darkest times and helping me find myself.",
+          img: "images/amethyst-crystal.png",
+          color: "violet",
+        },
+        {
+          id: "citrine",
+          title: "Citrine — Abundance & Joy",
+          message:
+            "Citrine is the stone of joy and abundance. May its golden light fill your days with optimism, creativity, and bright new beginnings. Your friendship has uplifted me more than words can say.",
+          img: "images/yellow-crystal.png",
+          color: "yellow",
+        },
+        {
+          id: "celestite",
+          title: "Celestite — Serenity & Inspiration",
+          message:
+            "Celestite brings gentle serenity and inspiration. May its sky-blue light fill your days with peace, clarity, and uplifting dreams. I love you so much, thank you for always being there and helping me become who I am.",
+          img: "images/blue-celestite.png",
+          color: "blue",
+        },
+        {
+          id: "rose-quartz",
+          title: "Rose Quartz — Love & Kindness",
+          message:
+            "Rose Quartz glows with gentle love and compassion. I hope you feel surrounded by warmth, kindness, and the deep care I have for you. Your friendship is a gift, and your loving spirit has made my world brighter.",
+          img: "images/rose-quartz.png",
+          color: "rose",
+        },
+        {
+          id: "black-obsidian",
+          title: "Black Obsidian — Protection & Strength",
+          message:
+            "Black Obsidian stands for protection and grounding. May you feel safe, strong, and supported in every step you take. Let its energy help you stand firm and move forward with confidence.",
+          img: "images/black-obsidian.png",
+          color: "black",
+        },
+      ];
+
+      const gardenEl = document.getElementById("garden");
+      const welcome = document.getElementById("welcome");
+      const cardModal = document.getElementById("cardModal");
+      const cardEl = document.getElementById("card");
+      const cardImg = document.getElementById("cardImg");
+      const cardTitle = document.getElementById("cardTitle");
+      const cardMsg = document.getElementById("cardMsg");
+      const closeCard = document.getElementById("closeCard");
+
+      // build crystal elements
+      crystals.forEach((c, i) => {
+        const btn = document.createElement("button");
+        btn.className = "crystal";
+        btn.setAttribute("data-color", c.color);
+        btn.innerHTML = `
+        <div class="float">
+          <img src="${c.img}" alt="${c.title}" loading="lazy"/>
+        </div>
+        <div style="text-align:center">
+          <strong style="color:var(--rose);font-family:'Marcellus',serif">${c.title}</strong>
+        </div>
+      `;
+        btn.addEventListener("click", () => openCard(i));
+        // subtle entrance delay
+        btn.style.opacity = 0;
+        btn.style.transform = "translateY(18px)";
+        gardenEl.appendChild(btn);
+
+        // entrance animation stagger
+        setTimeout(() => {
+          btn.style.transition = "all 650ms cubic-bezier(.2,.9,.2,1)";
+          btn.style.opacity = 1;
+          btn.style.transform = "none";
+        }, 350 + i * 160);
+      });
+
+      // show garden after welcome
+      function showGarden() {
+        const g = document.getElementById("garden");
+        g.classList.add("show");
+        g.setAttribute("aria-hidden", "false");
+      }
+
+      // Welcome disappears after 5s, then show garden
+      window.addEventListener("load", () => {
+        // Try to autoplay audio — browsers may block; we show play button as fallback.
+        const audio = document.getElementById("bgm");
+        audio.volume = 0.45;
+        audio
+          .play()
+          .then(() => {
+            document.getElementById("playBtn").style.display = "none";
+            document.getElementById("pauseBtn").style.display = "inline-flex";
+          })
+          .catch(() => {
+            // autoplay blocked — leave controls to user
+          });
+
+        // Welcome shows initially; hide after 5 seconds
+        setTimeout(() => {
+          if (welcome) welcome.style.display = "none";
+          showGarden();
+        }, 5000);
+      });
+
+      /* Card modal functions */
+      function openCard(index) {
+        const c = crystals[index];
+        cardImg.src = c.img;
+        cardTitle.textContent = c.title;
+        cardMsg.textContent = c.message;
+        cardModal.style.display = "flex";
+        cardModal.setAttribute("aria-hidden", "false");
+
+        // animate card in
+        setTimeout(() => cardEl.classList.add("show"), 40);
+      }
+      function closeCardFn() {
+        cardEl.classList.remove("show");
+        setTimeout(() => {
+          cardModal.style.display = "none";
+          cardModal.setAttribute("aria-hidden", "true");
+        }, 220);
+      }
+
+      closeCard.addEventListener("click", closeCardFn);
+      cardModal.addEventListener("click", (e) => {
+        if (e.target === cardModal) closeCardFn();
+      });
+
+      /* audio controls */
+      const playBtn = document.getElementById("playBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const bgm = document.getElementById("bgm");
+
+      playBtn.addEventListener("click", async () => {
+        try {
+          await bgm.play();
+          playBtn.style.display = "none";
+          pauseBtn.style.display = "inline-flex";
+        } catch (e) {
+          alert(
+            "Audio could not autoplay — please allow sound in your browser."
+          );
+        }
+      });
+      pauseBtn.addEventListener("click", () => {
+        bgm.pause();
+        pauseBtn.style.display = "none";
+        playBtn.style.display = "inline-flex";
+      });
+
+      // small nicety: hover glow toggle to intensify shadow on hover start for keyboard accessibility
+      gardenEl.addEventListener("mouseover", (e) => {
+        const el = e.target.closest(".crystal");
+        if (el) el.classList.add("hover-glow");
+      });
+      gardenEl.addEventListener("mouseout", (e) => {
+        const el = e.target.closest(".crystal");
+        if (el) el.classList.remove("hover-glow");
+      });
+
+      // Accessibility: keyboard open (Enter) and close (Esc)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (cardModal.style.display !== "none") closeCardFn();
+        }
+        if (e.key === "Enter") {
+          // if focus is on a crystal, open it
+          const focused = document.activeElement;
+          if (focused && focused.classList.contains("crystal")) {
+            const idx = Array.from(
+              document.querySelectorAll(".crystal")
+            ).indexOf(focused);
+            if (idx >= 0) openCard(idx);
+          }
+        }
+      });
+
+      // Make crystals keyboard-focusable
+      Array.from(document.querySelectorAll(".crystal")).forEach(
+        (el) => (el.tabIndex = 0)
+      );
+    </script>
+  </body>
+</html>
