@@ -471,9 +471,10 @@
     <div id="welcome" class="welcome" aria-hidden="false">
       <h1>Welcome, Fiona</h1>
       <p>
-        You are a light in my life. This garden is a small reflection of the
-        love, hope, and strength you've given me. I hope each crystal reminds
-        you how deeply you are cherished.
+        You came into my life when I was lost, and your light helped me find my
+        way again. This crystal garden is a reflection of the love, hope, and
+        strength you’ve given me. Each crystal carries a piece of what you mean
+        to me. Thank you for being my peace, my light, and my heart.
       </p>
     </div>
 
@@ -530,33 +531,33 @@
       const crystals = [
         {
           id: "amethyst",
-          title: "Amethyst — Calm",
+          title: "Amethyst — Calm & Clarity",
           message:
-            "Amethyst brings calm and clarity. May you find peace and gentle strength in every moment. Thank you for being a beam of hope in my darkest times and helping me find myself.",
+            "Amethyst reminds me of the peace you bring into my life. You appeared when I felt lost, and your light helped me see clearly again. You’ve shown me calm in chaos and reminded me that hope always finds a way.",
           img: "images/amethyst-crystal.png",
           color: "violet",
         },
         {
           id: "citrine",
-          title: "Citrine — Abundance & Joy",
+          title: "Citrine — Joy & Encouragement",
           message:
-            "Citrine is the stone of joy and abundance. May its golden light fill your days with optimism, creativity, and bright new beginnings. Your friendship has uplifted me more than words can say.",
+            "Citrine shines with joy, just like the way you light up my days. You’ve inspired me to keep going, to dream again, and to believe that brighter things are always ahead. Your encouragement became the spark that changed everything.",
           img: "images/yellow-crystal.png",
           color: "yellow",
         },
         {
           id: "celestite",
-          title: "Celestite — Serenity & Inspiration",
+          title: "Celestite — Faith & Connection",
           message:
-            "Celestite brings gentle serenity and inspiration. May its sky-blue light fill your days with peace, clarity, and uplifting dreams. I love you so much, thank you for always being there and helping me become who I am.",
+            "Celestite carries the energy of trust and divine connection. You helped me find faith again — in life, in myself, and in something bigger. You’ve been my peace, my grounding, and my reminder that some souls are meant to meet.",
           img: "images/blue-celestite.png",
           color: "blue",
         },
         {
           id: "rose-quartz",
-          title: "Rose Quartz — Love & Kindness",
+          title: "Rose Quartz — Love & Warmth",
           message:
-            "Rose Quartz glows with gentle love and compassion. I hope you feel surrounded by warmth, kindness, and deep care. Your friendship is a gift, and your loving spirit has made my world brighter.",
+            "Rose Quartz glows softly like the love and care you’ve given me. You are my comfort — the one person I could open up to fully. I love you so much, Fiona. You’ve changed my life with your warmth, and I’m endlessly grateful for you.",
           img: "images/rose-quartz.png",
           color: "rose",
         },
@@ -564,7 +565,7 @@
           id: "black-obsidian",
           title: "Black Obsidian — Protection & Strength",
           message:
-            "Black Obsidian stands for protection and grounding. May you feel safe, strong, and supported in every step you take. Let its energy help you stand firm and move forward with confidence.",
+            "Black Obsidian stands for grounding and protection. It reminds me of your strength — how you’ve stood by me through everything and kept me centered when I felt like falling apart. You are my safe space, my anchor, and my light.",
           img: "images/black-obsidian.png",
           color: "black",
         },
@@ -628,11 +629,11 @@
             // autoplay blocked — leave controls to user
           });
 
-        // Welcome shows initially; hide after 5 seconds
+        // Welcome shows initially; hide after 10 seconds
         setTimeout(() => {
           if (welcome) welcome.style.display = "none";
           showGarden();
-        }, 5000);
+        }, 10000);
       });
 
       /* Card modal functions */
